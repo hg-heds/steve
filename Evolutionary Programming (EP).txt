@@ -207,3 +207,10 @@ Go To Next
 
 https://towardsdatascience.com/evolutionary-computation-full-course-overview-f4e421e945d9
 https://www.sciencedirect.com/topics/computer-science/evolutionary-programming
+https://www.sciencedirect.com/science/article/pii/S0957417421007673
+https://www.sciencedirect.com/science/article/pii/S0960148120301270
+https://www.sciencedirect.com/science/article/pii/S1568494617306051
+
+
+https://www.sciencedirect.com/science/article/pii/S0045790622000313
+https://www.sciencedirect.com/science/article/pii/S1568494612001469
