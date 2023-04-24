@@ -1,10 +1,11 @@
 import numpy as np
 from matplotlib import pyplot as plt, animation as ani
-pop_size = 100
-pop_dimension = 1
-max_generations = 100
+pop_size = 40
+pop_dimension = 5
+max_generations = 1000
 limits = [-100,100]
 population = limits[0] + np.random.rand(pop_size,pop_dimension) * (limits[1]-limits[0])
+
 def paraboloid(X):
     return np.sum(X**2,axis=1)
 def rastrigin(X):
@@ -49,7 +50,7 @@ def animate(i):
     ax.clear()
     ax.set_ylim([0,100])
     ax.set_xlim([-5,5])
-    ax.plot(population,F(population),'.')
+    ax.plot(population[:,:],F(population),'.')
     selection(recombination("mean"))
 
     
