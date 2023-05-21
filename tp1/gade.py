@@ -160,7 +160,7 @@ def shade(pop_size = 100, dim = 2, max_gen = 400, lim = [-5.12,5.12]): # Success
     for _ in range(max_gen):
         S = []
         for i in range(pop_size):
-            r = np.random.permutation(H)[0]
+            r = np.random.randint(H)
             locked = np.random.randint(dim)
             cr = 0
             f = 0
@@ -196,9 +196,8 @@ def shade(pop_size = 100, dim = 2, max_gen = 400, lim = [-5.12,5.12]): # Success
     return min(rastrigin(population))
 
 
-def test(DIM = 10):
+def test(DIM = 10, SIZE = 20):
     tm = time()
-    SIZE = 20
     GEN = int(1e4/SIZE)
     lst_gade = [
         [ga(pop_size=SIZE, dim=DIM, max_gen=GEN) for _ in range(30)],
@@ -217,9 +216,9 @@ def test(DIM = 10):
         [stats.mean(lst),stats.stdev(lst),max(lst),min(lst)] for lst in lst_gade
     ]
     df = DataFrame(df,['GA','DE_rand-1','DE_best-1','DE_best-2','DE_mean-1','DE_rand-to-best-1','DE_current-to-best-1','DE_current-to-pbest-1','DE_rand-2','sade','shade'],['mean','desvio padrão', 'max','min'])
-    print('\n\nDim: '+str(DIM))
+    print('\n\nDim: '+str(DIM)+'\t Size: '+str(SIZE))
     print(df.to_string())
     print(time()-tm)
-
-for dim in [2,5,10]:
-    test(DIM = dim)
+for size in [100,25,20,10]:
+    for dim in [2,5,10,12]:
+        test(DIM = dim, SIZE=size)  
