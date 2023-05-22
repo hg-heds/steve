@@ -3,7 +3,7 @@ from pandas import DataFrame, options
 from time import time
 import statistics as stats
 from scipy.stats import cauchy
-DEV = False
+DEV = True
 import warnings
 warnings.filterwarnings("error")
 
@@ -11,25 +11,23 @@ warnings.filterwarnings("error")
 options.display.float_format = '{:,.8f}'.format
 
 def rastrigin(X):
-    offset = -1
+    offset = 0
     shape = X.shape
     if len(shape)>1:
         return 10*shape[1] + np.sum((X+offset)**2-10*np.cos(2*np.pi*(X+offset)),axis=1)
-    else: return 10 + np.sum((X+offset)**2-10*np.cos(2*np.pi*(X+offset)))
+    else: return 10*shape[0] + np.sum((X+offset)**2-10*np.cos(2*np.pi*(X+offset)))
 
 def ga(pop_size = 100, dim = 2, max_gen = 400, lim = [-5.12,5.12], rec_type = 'wid-offset-var'):
-    if DEV: return 9
     xmin, xmax = lim
     population = lim[0] + np.random.rand(pop_size,dim) * (xmax-xmin)
     for _ in range(max_gen):
+        new_pop = np.zeros((pop_size,dim))
         ##################################################################################### recombination
-        r = np.random.randint(0,pop_size,pop_size)
-        if rec_type == 'mean':
-            new_pop = (population + population[r])/2############# mean
-        elif rec_type == 'wid-offset-var': 
-            new_pop = population + (2*np.random.rand(pop_size,dim) - 0.5)*(population[np.random.randint(0,pop_size,pop_size)] - population)
+        for i in range(pop_size):
+            r1,r2,r3 = np.random.randint(0,pop_size,3)
+            new_pop[i] = population[r1] + (1.3*np.random.rand(dim) - 0.2)*(population[r2] - population[r3])
         ##################################################################################### mutation
-        mutation_prob = np.random.rand(pop_size)<0.5
+        mutation_prob = np.random.rand(pop_size)<0.2
         new_pop[mutation_prob,:] = new_pop[mutation_prob,:] + 0.5 * (np.random.random((pop_size,dim))[mutation_prob,:] - 0.5) * (xmax-xmin)
         new_pop[new_pop>xmax] = xmax
         new_pop[new_pop<xmin] = xmin
@@ -101,14 +99,13 @@ def de(pop_size = 100, dim = 2, max_gen = 400, lim = [-5.12,5.12], de_type = 'ra
 
 def sade(pop_size = 100, dim = 2, max_gen = 400, lim = [-5.12,5.12]): # Self-adaptive Differential Evolution Algorithm
     xmin, xmax = lim
-    if DEV: return 9
     population = lim[0] + np.random.rand(pop_size,dim) * (xmax-xmin)
     f_pop = rastrigin(population)
     prob_rand = 0.5 # prob_ctb = 1 - prob_rand
     integrated = {'rand-1':0, 'current-to-best-1':0}
     discarded = {'rand-1':0, 'current-to-best-1':0}
     for gen in range(1,max_gen+1):
-        if gen%50 == 0:
+        if gen%20 == 0:
             # print(gen, prob_rand, integrated, discarded)
             ns1 = integrated['rand-1']
             ns2 = integrated['current-to-best-1']
@@ -151,6 +148,7 @@ def sade(pop_size = 100, dim = 2, max_gen = 400, lim = [-5.12,5.12]): # Self-ada
 
 def shade(pop_size = 100, dim = 2, max_gen = 400, lim = [-5.12,5.12]): # Success History Parameter Adaptation for Differential Evolution
     xmin, xmax = lim
+    if DEV: return 9
     population = lim[0] + np.random.rand(pop_size,dim) * (xmax-xmin)
     f_pop = rastrigin(population)
     H = 10
@@ -196,7 +194,7 @@ def shade(pop_size = 100, dim = 2, max_gen = 400, lim = [-5.12,5.12]): # Success
     return min(rastrigin(population))
 
 
-def test(DIM = 10, SIZE = 20):
+def test(DIM = 10, SIZE = 100):
     tm = time()
     GEN = int(1e4/SIZE)
     lst_gade = [
@@ -219,6 +217,6 @@ def test(DIM = 10, SIZE = 20):
     print('\n\nDim: '+str(DIM)+'\t Size: '+str(SIZE))
     print(df.to_string())
     print(time()-tm)
-for size in [100,25,20,10]:
-    for dim in [2,5,10,12]:
+for size in [100]:
+    for dim in [2,5,10]:
         test(DIM = dim, SIZE=size)  
