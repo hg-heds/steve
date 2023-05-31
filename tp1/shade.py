@@ -7,7 +7,7 @@ def rastrigin(X):
     shape = X.shape
     if len(shape)>1:
         return 10*shape[1] + np.sum((X+offset)**2-10*np.cos(2*np.pi*(X+offset)),axis=1)
-    else: return 10*np.shape[0] + np.sum((X+offset)**2-10*np.cos(2*np.pi*(X+offset)))
+    else: return 10*shape[0] + np.sum((X+offset)**2-10*np.cos(2*np.pi*(X+offset)))
 
 def shade(pop_size = 100, dim = 2, max_gen = 400, lim = [-5.12,5.12]): # Success History Parameter Adaptation for Differential Evolution
     xmin, xmax = lim
