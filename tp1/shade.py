@@ -7,12 +7,21 @@ def rastrigin(X):
     shape = X.shape
     if len(shape)>1:
         return 10*shape[1] + np.sum((X+offset)**2-10*np.cos(2*np.pi*(X+offset)),axis=1)
-    else: return 10*shape[0] + np.sum((X+offset)**2-10*np.cos(2*np.pi*(X+offset)))
+    else:
+        return 10*shape[0] + np.sum((X+offset)**2-10*np.cos(2*np.pi*(X+offset)))
 
-def shade(pop_size = 100, dim = 2, max_gen = 400, lim = [-5.12,5.12]): # Success History Parameter Adaptation for Differential Evolution
+def schwefel(X):  # minimum 0 at (420.9687,420.9687,...,420.9687)
+    offset = 0
+    shape = X.shape
+    if len(shape)>1:
+        return 418.9829 * shape[1] - np.sum((X+offset)*np.sin(np.sqrt(np.abs(X+offset))),axis=1)
+    else: 
+        return 418.9829 * shape[0] - np.sum((X+offset)*np.sin(np.sqrt(np.abs(X+offset))))
+
+def shade(F=rastrigin,pop_size = 100, dim = 2, max_gen = 400, lim = [-5.12,5.12]): # Success History Parameter Adaptation for Differential Evolution
     xmin, xmax = lim
     population = xmin + np.random.rand(pop_size,dim) * (xmax-xmin)
-    f_pop = rastrigin(population)
+    f_pop = F(population)
     H = 10
     k = 0
     mcr = np.ones(H)*0.5
@@ -38,8 +47,8 @@ def shade(pop_size = 100, dim = 2, max_gen = 400, lim = [-5.12,5.12]): # Success
         rand = np.random.rand(pop_size,dim)<np.expand_dims(cr,axis=1)
         rand[np.arange(pop_size),locked] = False
         children[rand] = population[rand]
-        f_parents = rastrigin(population)
-        f_children = rastrigin(children)
+        f_parents = F(population)
+        f_children = F(children)
         df = abs(f_children-f_parents)
         integrate = f_children < f_parents
         population[integrate] = children[integrate] 
@@ -52,14 +61,14 @@ def shade(pop_size = 100, dim = 2, max_gen = 400, lim = [-5.12,5.12]): # Success
             mcr[k] = np.sum(sdf/np.sum(sdf)*scr)
             mf[k] = np.sum(sdf/np.sum(sdf)*sf**2)/np.sum(sdf/np.sum(sdf)*sf)
             k = (k+1)%H
-        f_pop = rastrigin(population)
-    return min(rastrigin(population))
+        f_pop = F(population)
+    return (min(f_pop))
 
 
-pop_size = 20
-gen = int(1e4/pop_size)
+pop_size = 50
+gen = int(1e5/pop_size)
 
 for dim in [2,5,10]:
-    lst = [shade(pop_size=pop_size, dim=dim, max_gen=gen) for _ in range(30)]
+    lst = [shade(F=schwefel,pop_size=pop_size, dim=dim, max_gen=gen,lim=[-500,500]) for _ in range(30)]
     print(f'# de Variáveis: {dim}\nMédia: {stats.mean(lst)}\nDesvio Padrão: {stats.stdev(lst)}\n')
      
