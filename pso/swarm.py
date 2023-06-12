@@ -58,6 +58,7 @@ def pso(f=rastrigin, swarm_size=100, dim=2, max_epoch=400, plot=False, coef=None
         #     attraction_pbest *= 
 
         if plot:
+
             convergence.append(f_gbest)
             ax.clear()
             ax.scatter(swarm[:,0],swarm[:,1])
@@ -73,6 +74,7 @@ def pso(f=rastrigin, swarm_size=100, dim=2, max_epoch=400, plot=False, coef=None
             # plt.waitforbuttonpress()
             plt.pause(0.00001)
 
+
     if plot:
 
         ax.clear()
@@ -86,11 +88,12 @@ def pso(f=rastrigin, swarm_size=100, dim=2, max_epoch=400, plot=False, coef=None
         ax.set_xticks(major_ticks)
         ax.set_yticks(major_ticks)
         plt.show(block=True)
+
     return (gbest, f_gbest)
 
 
 if __name__ == "__main__":
-
+    
     results = []
     # for fun, func in enumerate([rastrigin, paraboloid, rosenbrock, griewank, ackley, styblinski_tang, schwefel, dixon_price, zakharov, levy]):
     for i,coef in enumerate(list(product(np.round(np.arange(0,1,0.1)+0.1,2),repeat=3))):
