@@ -20,7 +20,7 @@ def select(f_swarm,i):
 
 
 
-def CLPSO_simple(f=rastrigin, swarm_size=100, dim=2, max_epoch=400, plot=False, coef=None):
+def CLPSO_simple(f=rastrigin, swarm_size=30, dim=2, max_epoch=400, plot=False, coef=None):
 
     xmin, xmax      = f_range(f)
     v_max           = (xmax-xmin) / 20
@@ -114,6 +114,7 @@ def CLPSO_simple(f=rastrigin, swarm_size=100, dim=2, max_epoch=400, plot=False, 
 
 
 if __name__ == "__main__":
+    print('CLPSO')
     for dim in [2,5,10]:
-        lst = [CLPSO_simple(rastrigin,dim=dim,swarm_size=200,max_epoch=500)[1] for _ in range(30)]
+        lst = [CLPSO_simple(rastrigin,dim=dim,swarm_size=50,max_epoch=100)[1] for _ in range(30)]
         print(f'{dim}\nMean: {stats.mean(lst)}\nStdev: {stats.stdev(lst)}\nMin: {min(lst)}\nMax: {max(lst)}\n')

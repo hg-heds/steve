@@ -93,6 +93,7 @@ def PSO(f=rastrigin, swarm_size=100, dim=2, max_epoch=400, plot=False, coef=None
 
 
 if __name__ == "__main__":
+    print('PSO')
     for dim in [2,5,10]:
-        lst = [PSO(rastrigin,dim=dim,swarm_size=200,max_epoch=500)[1] for _ in range(30)]
+        lst = [PSO(rastrigin,dim=dim,swarm_size=50,max_epoch=100)[1] for _ in range(30)]
         print(f'{dim}\nMean:{stats.mean(lst)}\nStdev: {stats.stdev(lst)}\nMin: {min(lst)}\nMax:{max(lst)}\n\n')
