@@ -4,38 +4,30 @@ import statistics as stats
 from functions import *
 from itertools import product
 np.set_printoptions(suppress=True,precision=2)
-STOP = False
+LOOP = True
 
 def onclose(event):
-    global STOP 
-    STOP = True
+    global LOOP 
+    LOOP = False
 
-
-def select(f_swarm,i):
-    rand = np.random.permutation(len(f_swarm))[:3]
-    rand = rand[rand != i]
-    r1,r2 = rand[0],rand[1]
-    if f_swarm[r1] > f_swarm[r2]: return r2 
-    return r1
-
-
-
-def CLPSO_simple(f=rastrigin, swarm_size=30, dim=2, max_epoch=400, plot=False, coef=None):
+def PSO_sono(f=rastrigin, swarm_size=50, dim=2, max_epoch=100, plot=False, coef=None):
 
     xmin, xmax      = f_range(f)
     v_max           = (xmax-xmin) / 20
     swarm           = xmin + np.random.rand(swarm_size,dim) * (xmax-xmin)
     f_swarm         = f(swarm)
     v               = v_max * (2*np.random.rand(swarm_size,dim)-1)
-    inertia_max     = 0.9
-    inertia_min     = 0.4
 
-    c               = 2
+    omega_max       = 0.9
+    omega_min       = 0.4
 
     pbest           = swarm.copy()
     f_pbest         = f_swarm.copy()
     gbest           = swarm[np.argmin(f_swarm)]
     f_gbest         = f_swarm[np.argmin(f_swarm)]
+
+    r = 0
+    G = 1
 
 
     if plot:
@@ -47,11 +39,19 @@ def CLPSO_simple(f=rastrigin, swarm_size=30, dim=2, max_epoch=400, plot=False, c
         convergence = [f_gbest]
         fig.canvas.mpl_connect('close_event', onclose)
 
-
-    pc = 0.05 + 0.45 * (np.exp(10*(np.arange(max_epoch)-1)/(max_epoch-1))-1) / (np.exp(10)-1)
-
     for epoch in range(max_epoch):
-        if STOP: break
+
+        if not LOOP: break
+
+        sort = np.argsort(f_swarm)
+        f_swarm = f_swarm[sort]
+        swarm = swarm[sort]
+
+        omega = omega_max - epoch/max_epoch * (omega_max-omega_min)
+        c1 = 2.5 - 2*epoch/max_epoch
+        c2 = 0.5 + 2*epoch/max_epoch
+        
+
 
         swarm                   = swarm + v 
         swarm[swarm>xmax]       = xmax
@@ -62,15 +62,8 @@ def CLPSO_simple(f=rastrigin, swarm_size=30, dim=2, max_epoch=400, plot=False, c
         argbest                 = np.argmin(f_pbest)
         gbest                   = pbest[argbest]
         f_gbest                 = f_pbest[argbest]
-        inertia                 = inertia_max - epoch/max_epoch * (inertia_max-inertia_min)
  
-
-        for i in range(len(v)):
-            for d in range(len(v[i])):
-                pbest_f = pbest[i,d] if np.random.rand() > pc[epoch] else pbest[select(f_swarm,i),d]
-                v[i,d] = inertia * v[i,d] + c * np.random.rand() * (pbest_f-swarm[i,d])
-
-
+        v =  v + attraction_pbest * np.random.rand(swarm_size, 1) * (pbest - swarm) + attraction_gbest * np.random.rand(swarm_size, 1) * (gbest - swarm)
 
         v[v>v_max]              = v_max
         v[v<-v_max]             = -v_max
@@ -114,7 +107,7 @@ def CLPSO_simple(f=rastrigin, swarm_size=30, dim=2, max_epoch=400, plot=False, c
 
 
 if __name__ == "__main__":
-    print('CLPSO')
-    for dim in [2,5,10,30,50]:
-        lst = [CLPSO_simple(rastrigin,dim=dim,swarm_size=50,max_epoch=100)[1] for _ in range(30)]
-        print(f'{dim}\nMean: {stats.mean(lst)}\nStdev: {stats.stdev(lst)}\nMin: {min(lst)}\nMax: {max(lst)}\n')
+    print('PSO')
+    for dim in [2,5,10]:
+        lst = [PSO(rastrigin,dim=dim,swarm_size=50,max_epoch=100)[1] for _ in range(30)]
+        print(f'{dim}\nMean:{stats.mean(lst)}\nStdev: {stats.stdev(lst)}\nMin: {min(lst)}\nMax:{max(lst)}\n\n')

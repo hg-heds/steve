@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 import statistics as stats
 from functions import *
-from itertools import product
+from time import time
 np.set_printoptions(suppress=True,precision=2)
 LOOP = True
 
@@ -10,7 +10,7 @@ def onclose(event):
     global LOOP 
     LOOP = False
 
-def iwPSO(f=rastrigin, swarm_size=100, dim=2, max_epoch=400, plot=False, coef=None):
+def PSO(f=rastrigin, swarm_size=100, dim=2, max_epoch=400, plot=False, coef=None):
 
     xmin, xmax      = f_range(f)
     v_max           = (xmax-xmin) / 20
@@ -18,7 +18,7 @@ def iwPSO(f=rastrigin, swarm_size=100, dim=2, max_epoch=400, plot=False, coef=No
     f_swarm         = f(swarm)
     v               = v_max * (2*np.random.rand(swarm_size,dim)-1)
 
-    inertia, attraction_pbest, attraction_gbest = coef if coef else 1, 0.1, 0.1
+    attraction_pbest, attraction_gbest = coef if coef else 2,2
 
     pbest           = swarm.copy()
     f_pbest         = f_swarm.copy()
@@ -49,7 +49,7 @@ def iwPSO(f=rastrigin, swarm_size=100, dim=2, max_epoch=400, plot=False, coef=No
         gbest                   = pbest[argbest]
         f_gbest                 = f_pbest[argbest]
  
-        v = inertia * v + attraction_pbest * np.random.rand(swarm_size, 1) * (pbest - swarm) + attraction_gbest * np.random.rand(swarm_size, 1) * (gbest - swarm)
+        v =  v + attraction_pbest * np.random.rand(swarm_size, 1) * (pbest - swarm) + attraction_gbest * np.random.rand(swarm_size, 1) * (gbest - swarm)
 
         v[v>v_max]              = v_max
         v[v<-v_max]             = -v_max
@@ -93,8 +93,8 @@ def iwPSO(f=rastrigin, swarm_size=100, dim=2, max_epoch=400, plot=False, coef=No
 
 
 if __name__ == "__main__":
-    print('iwPSO')
-    for dim in [2,5,10]:
-        lst = [iwPSO(rastrigin,dim=dim,swarm_size=50,max_epoch=100)[1] for _ in range(30)]
-        print(f'{dim}\nMean:{stats.mean(lst)}\nStdev: {stats.stdev(lst)}\nMin: {min(lst)}\nMax:{max(lst)}\n\n')
-
+    print('PSO')
+    for dim in [2,5,10,30,50]:
+        t = time()
+        lst = [PSO(rastrigin,dim=dim,swarm_size=50,max_epoch=100)[1] for _ in range(30)]
+        print(f'{dim}\nMean:{stats.mean(lst)}\nStdev: {stats.stdev(lst)}\nMin: {min(lst)}\nMax:{max(lst)}\nTime: {time()-t}\n')
